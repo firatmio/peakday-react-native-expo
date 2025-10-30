@@ -2,8 +2,6 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function Settings() {
-  const deneme = React.useRef<View>(null);
-
   return (
     <View style={styles.container}>
       <Text>Settings Screen</Text>
