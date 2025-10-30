@@ -1,36 +1,59 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const getTasks = async (id: number) => {
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  time: string;
+}
+
+export const storeTask = async (dayId: number, title: string, description: string, time: Date) => {
   try {
-    const jsonValue = await AsyncStorage.getItem(`tasks:${id}`);
-    if (jsonValue) {
-      return JSON.parse(jsonValue);
-    } else {
-      return []; // boşsa boş array dön
-    }
-  } catch (e) {
-    console.error("Error reading tasks:", e);
+    const existingTasksJson = await AsyncStorage.getItem(`tasks:${dayId}`);
+    const existingTasks: Task[] = existingTasksJson ? JSON.parse(existingTasksJson) : [];
+
+    const newTask: Task = {
+      id: Date.now().toString(),
+      title,
+      description,
+      time: time.toISOString()
+    };
+
+    const updatedTasks = [...existingTasks, newTask];
+    await AsyncStorage.setItem(`tasks:${dayId}`, JSON.stringify(updatedTasks));
+  } catch (error) {
+    console.error("Task kaydedilemedi:", error);
+  }
+};
+
+export const getTasks = async (dayId: number): Promise<Task[]> => {
+  try {
+    const tasksJson = await AsyncStorage.getItem(`tasks:${dayId}`);
+    return tasksJson ? JSON.parse(tasksJson) : [];
+  } catch (error) {
+    console.error("Tasklar çekilemedi:", error);
     return [];
   }
 };
 
-export const storeTasks = async (id: number, tasks: any[]) => {
+export const updateTask = async (dayId: number, taskId: string | undefined, updatedData: Partial<Omit<Task, 'id'>> | null | undefined) => {
   try {
-    const jsonValue = JSON.stringify(tasks);
-    await AsyncStorage.setItem(`tasks:${id}`, jsonValue);
-    return true;
-  } catch (e) {
-    console.error("Error saving tasks:", e);
-    return false;
+    const tasks = await getTasks(dayId);
+    const updatedTasks = tasks.map(task =>
+      task.id === taskId ? { ...task, ...updatedData } : task
+    );
+    await AsyncStorage.setItem(`tasks:${dayId}`, JSON.stringify(updatedTasks));
+  } catch (error) {
+    console.error("Task güncellenemedi:", error);
   }
 };
 
-export const removeTasks = async (id: number) => {
+export const deleteTask = async (dayId: number, taskId: string) => {
   try {
-    await AsyncStorage.removeItem(`tasks:${id}`);
-    return true;
-  } catch (e) {
-    console.error("Error removing tasks:", e);
-    return false;
+    const tasks = await getTasks(dayId);
+    const filteredTasks = tasks.filter(task => task.id !== taskId);
+    await AsyncStorage.setItem(`tasks:${dayId}`, JSON.stringify(filteredTasks));
+  } catch (error) {
+    console.error("Task silinemedi:", error);
   }
 };
