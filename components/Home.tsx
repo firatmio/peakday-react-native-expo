@@ -4,6 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { dayProps, Task } from "../utils/types";
 import { getTasks } from "../context/tasks";
 import { eventBus } from "../utils/eventBus";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Home() {
   const [today, setToday] = useState<dayProps | null>(null);
@@ -67,71 +68,96 @@ export default function Home() {
             : "Yükleniyor..."}
         </Text>
       </View>
-      <Text
-        style={{
-          fontSize: 24,
-          fontWeight: "600",
-          paddingTop: 30,
-        }}
-      >
-        Bugünün görevleri:
-      </Text>
-      <View
-        style={{
-          paddingTop: 20,
-          display: "flex",
-          flexDirection: "column",
-          gap: 15,
-        }}
-      >
-        {todayTasks?.map((task) => (
-          <TouchableOpacity
-            key={task.id}
-            style={styles.taskItem}
-            onPress={() => {
-              setSelectedTaskId(task.id);
+      {todayTasks?.length === 0 ? (
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 15,
+            justifyContent: "center",
+            alignItems: "center",
+            flex: 1,
+          }}
+        >
+          <Ionicons name="layers" size={54} color="rgba(0,0,0,.4)"></Ionicons>
+          <Text
+            style={{
+              color: "rgba(0,0,0,.5)",
+              fontSize: 20,
             }}
           >
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontWeight: "600",
+            Hiç görev bulunamadı
+          </Text>
+        </View>
+      ) : (
+        <View>
+          <Text
+            style={{
+              fontSize: 24,
+              fontWeight: "600",
+              paddingTop: 30,
+            }}
+          >
+            Bugünün görevleri:
+          </Text>
+          <View
+            style={{
+              paddingTop: 20,
+              display: "flex",
+              flexDirection: "column",
+              gap: 15,
+            }}
+          >
+            {todayTasks?.map((task) => (
+              <TouchableOpacity
+                key={task.id}
+                style={styles.taskItem}
+                onPress={() => {
+                  setSelectedTaskId(task.id);
                 }}
               >
-                {task.title}
-              </Text>
-              {task.description && (
-                <Text
+                <View
                   style={{
-                    fontSize: 16,
-                    color: "rgba(0,0,0,.75)",
+                    display: "flex",
+                    flexDirection: "column",
                   }}
                 >
-                  {task.description}
-                </Text>
-              )}
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: "600",
-                  color: "rgba(0,0,0,.5)",
-                }}
-              >
-                {new Date(task.time).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "600",
+                    }}
+                  >
+                    {task.title}
+                  </Text>
+                  {task.description && (
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        color: "rgba(0,0,0,.75)",
+                      }}
+                    >
+                      {task.description}
+                    </Text>
+                  )}
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: "600",
+                      color: "rgba(0,0,0,.5)",
+                    }}
+                  >
+                    {new Date(task.time).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      )}
     </View>
   );
 }

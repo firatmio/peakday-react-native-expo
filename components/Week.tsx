@@ -178,7 +178,7 @@ export default function Week() {
                   styles.selectedHeaderItemText,
               ]}
             >
-              {item.title.slice(0, 3)}
+              {item.title == "Cumartesi" ? "Cmt" : item.title.slice(0, 3)}
             </Text>
           </TouchableOpacity>
         ))}
